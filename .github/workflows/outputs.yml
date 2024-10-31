@@ -1,0 +1,49 @@
+name: Events Demo 1
+on:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - main # main
+      - 'dev-*' # dev-new dev-this-is-new
+      - 'feat/**' # feat/new feat/new/button
+  workflow_dispatch:
+  push:
+    branches:
+      - main # main
+      - 'dev-*' # dev-new dev-this-is-new
+      - 'feat/**' # feat/new feat/new/button
+      # developer-1
+    #paths-ignore:
+    # - '.github/workflows/*'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    outputs:
+      scripts-file: ${{ steps.publish.outpus.test-file }}
+    steps:
+      - name: Output event data
+        run: echo "${{ toJSON(github.event) }}"
+      - name: Get code
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm ci
+      - name: Test code
+        run: npm run test
+      - name: Build code
+        run: npm run build
+      - name: publish js file
+        id: publish
+        run: find dist/assets/*.js -type f -execdir 'test-file={}' >> $GITHUB_OUTPUTS ';'
+      
+  build:
+    needs: deploy
+    runs-on: ubuntu-latest
+  
+    steps:
+      - name: output file
+        run: echo "${{needs.deploy.outputs.scripts-file }}"
+       
+      
+      - name: Deploy project
+        run: echo "Deploying..."
