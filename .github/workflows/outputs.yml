@@ -20,7 +20,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     outputs:
-      scripts-file: ${{ steps.publish.outpus.test-file }}
+      scripts-file: ${{ steps.publish.outputs.test-file }}
     steps:
       - name: Output event data
         run: echo "${{ toJSON(github.event) }}"
